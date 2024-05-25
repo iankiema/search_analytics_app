@@ -6,16 +6,6 @@ class SearchQueriesController < ApplicationController
   end
 
   def create
-        # # Assuming the frontend will send a flag 'complete' to indicate if a query is complete
-        # if params[:search_query][:complete]
-        #   @search_query = SearchQuery.new(search_query_params)
-        #   @search_query.user_ip = request.remote_ip
-        #   @search_query.save
-        # end
-        # head :ok
-
-
-
     query = params[:search_query][:query]
     complete = params[:search_query][:complete]
     if complete
