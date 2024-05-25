@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Search Analytics</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+</head>
+<body>
+  <div class="container">
+    <h1>Real-time Search Analytics</h1>
+    <div style="position: relative;">
+      <input type="text" id="search-box" placeholder="Type your search...">
+      <div id="search-suggestions"></div>
+    </div>
+    <button id="clear-button">Clear</button>
+    <div id="results"></div>
+
+    <h2>Search Trends</h2>
+    <ul id="search-trends">
+      <% @search_queries.each do |query, count| %>
+        <li><%= query %> - <%= count %></li>
+      <% end %>
+    </ul>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const searchBox = document.getElementById("search-box");
+      const searchSuggestions = document.getElementById("search-suggestions");
+      const clearButton = document.getElementById("clear-button");
+      const searchTrends = document.getElementById("search-trends");
+      let typingTimeout;
+      let typing = true;
+
+      const fetchSearchTrends = () => {
+        axios.get('/search_queries/trends')
+          .then(response => {
+            displaySearchTrends(response.data);
+          })
+          .catch(error => {
+            console.error("There was an error fetching search trends:", error);
+          });
+      };
+
+      const displaySearchTrends = (trends) => {
+        trends.sort((a, b) => b.count - a.count);
+        searchTrends.innerHTML = "";
+        trends.forEach(trend => {
+          const listItem = document.createElement("li");
+          listItem.textContent = `${trend.query} - ${trend.count}`;
+          searchTrends.appendChild(listItem);
+        });
+      };
+
+      const logSearchQuery = (query, complete) => {
+        axios.post('/search_queries', { search_query: { query, complete } })
+          .then(response => {
+            console.log(`${complete ? 'Complete' : 'Partial'} search query logged:`, query);
+            if (complete) fetchSearchTrends();
+          })
+          .catch(error => {
+            console.error(`There was an error logging the ${complete ? 'complete' : 'partial'} search query:`, error);
+          });
+      };
+
+      const handleCompleteSearch = _.debounce((query) => {
+        if (typing) {
+          logSearchQuery(query, true);
+        }
+      }, 1500);
+
+      const fetchSearchSuggestions = (query) => {
+        axios.post('/search_queries/suggest', { query })
+          .then(response => {
+            displaySearchSuggestions(response.data);
+          })
+          .catch(error => {
+            console.error("There was an error fetching search suggestions:", error);
+          });
+      };
+
+      const displaySearchSuggestions = (suggestions) => {
+        if (suggestions.length > 0) {
+          const suggestionList = suggestions.map(suggestion => `<div class="search-suggestion">${suggestion}</div>`).join('');
+          searchSuggestions.innerHTML = suggestionList;
+          searchSuggestions.style.display = "block";
+        } else {
+          searchSuggestions.innerHTML = "";
+          searchSuggestions.style.display = "none";
+        }
+      };
+
+      searchBox.addEventListener("input", (event) => {
+        const query = event.target.value.trim();
+        if (query) {
+          clearTimeout(typingTimeout);
+          typing = true;
+          logSearchQuery(query, false);
+          fetchSearchSuggestions(query);
+
+          typingTimeout = setTimeout(() => {
+            handleCompleteSearch(query);
+          }, 1500);
+        } else {
+          searchSuggestions.innerHTML = "";
+          searchSuggestions.style.display = "none";
+        }
+      });
+
+      searchSuggestions.addEventListener("click", (event) => {
+        if (event.target.classList.contains("search-suggestion")) {
+          const clickedSuggestion = event.target.textContent;
+          typing = false;
+          logSearchQuery(clickedSuggestion, true);
+          searchBox.value = "";
+          searchSuggestions.innerHTML = "";
+          searchSuggestions.style.display = "none";
+        }
+      });
+
+      clearButton.addEventListener("click", () => {
+        searchBox.value = "";
+        searchSuggestions.innerHTML = "";
+        searchSuggestions.style.display = "none";
+      });
+
+      fetchSearchTrends();
+    });
+  </script>
+</body>
+</html>
