@@ -1,25 +1,25 @@
 <a name="readme-top"></a>
 
-📗 Table of Contents
-Search Analytics
-🛠 Built With
-Tech Stack
-Key Features
-💻 Getting Started
-Prerequisites
-Setup
-Install
-Usage
-Run tests
-📚 API Documentation
-👥 Authors
-🔭 Future Features
-🤝 Contributing
-⭐️ Show your support
-🙏 Acknowledgments
+📗 <h1>Table of Contents </h1> </br>
+Search Analytics</br>
+🛠 Built With</br>
+Tech Stack</br>
+Key Features</br>
+💻 Getting Started</br>
+Prerequisites</br>
+Setup</br>
+Install</br>
+Usage</br>
+Run tests</br>
+📚 API Documentation</br>
+👥 Authors</br>
+🔭 Future Features</br>
+🤝 Contributing</br>
+⭐️ Show your support</br>
+🙏 Acknowledgments</br>
 📝 License
 
-Search Analytics<a name="about-project"></a>
+<h2>Search Analytics</h2><a name="about-project"></a>
 Search Analytics is a web application that tracks and analyzes search queries in real-time. It provides insights into user search behavior by logging complete search queries, displaying real-time search suggestions, and updating search trends dynamically.
 
 🛠 Built With <a name="built-with"></a>
