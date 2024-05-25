@@ -46,6 +46,7 @@
       };
 
       const displaySearchTrends = (trends) => {
+        trends.sort((a, b) => b.count - a.count);
         searchTrends.innerHTML = "";
         trends.forEach(trend => {
           const listItem = document.createElement("li");
@@ -58,6 +59,7 @@
         axios.post('/search_queries', { search_query: { query, complete } })
           .then(response => {
             console.log(`${complete ? 'Complete' : 'Partial'} search query logged:`, query);
+            if (complete) fetchSearchTrends();
           })
           .catch(error => {
             console.error(`There was an error logging the ${complete ? 'complete' : 'partial'} search query:`, error);
@@ -67,7 +69,6 @@
       const handleCompleteSearch = _.debounce((query) => {
         if (typing) {
           logSearchQuery(query, true);
-          fetchSearchTrends();
         }
       }, 1500);
 
@@ -124,14 +125,6 @@
         searchBox.value = "";
         searchSuggestions.innerHTML = "";
         searchSuggestions.style.display = "none";
-
-        axios.delete('/search_queries/destroy_all')
-          .then(response => {
-            console.log("All search queries cleared");
-          })
-          .catch(error => {
-            console.error("There was an error clearing the search queries:", error);
-          });
       });
 
       fetchSearchTrends();
