@@ -1,6 +1,6 @@
 databases:
-  - name: search-analytics-app
-    databaseName: mysite_syeh
+  - name: mysite
+    databaseName: mysite
     user: mysite
     plan: free
 
@@ -15,9 +15,9 @@ services:
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: search-analytics-app
+          name: mysite
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
       - key: WEB_CONCURRENCY
-        value: 2
+        value: 2 # sensible default
